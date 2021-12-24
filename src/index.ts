@@ -1,4 +1,4 @@
-import {Coins, LCDClient} from '@terra-money/terra.js';
+import {Coins, LCDClient, MsgExecuteContract} from '@terra-money/terra.js';
 
 const terra = new LCDClient({
     URL: 'https://lcd.terra.dev',
@@ -6,13 +6,21 @@ const terra = new LCDClient({
 });
 
 async function fetchTokens(){
-    const accountInfo = await terra.auth.accountInfo(
-        'terra1zsky63r58vc7dfn3ljj32ch6fyn4e5qd8skzyz'
-    );
-    // console.log(accountInfo);
-    const r = await terra.bank.balance('terra1zsky63r58vc7dfn3ljj32ch6fyn4e5qd8skzyz');
+    const walletAddress = 'terra16a590uc6f5y2gjdpzhqsreuvfj7g7ncywxnnyh';
+    const r = await terra.bank.balance(walletAddress);
     const coins:Coins = r[0];
-    console.log(coins);
+    let balances = JSON.parse(JSON.parse(JSON.stringify( coins )));
+    console.log('COIN ASSETS:')
+    for( let coin in balances ){
+        const coinInfo = balances[coin];
+        console.log(coinInfo);
+    }
+
+    const contractAddress = 'terra140k6k2pmh2lmy4q4wyz5znqmtgwvs3gkgfeevq';
+    const tShibaBalance = await terra.wasm.contractQuery(contractAddress, { balance: { address: walletAddress } })
+    console.log('tShiba Balance', tShibaBalance);
+
+
 }
 
 async function main() {
